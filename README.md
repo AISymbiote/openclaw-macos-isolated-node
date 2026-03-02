@@ -25,15 +25,17 @@ cat prompts/codex-install.txt
 # 或
 cat prompts/claude-install.txt
 ```
+提示词文件链接：[prompts/codex-install.txt](prompts/codex-install.txt) / [prompts/claude-install.txt](prompts/claude-install.txt)
 4. 按提示确认：`sudo`、API Key、Provider、聊天渠道。  
 5. 完成后执行验收：
 ```bash
 bash scripts/verify-service.sh
 ```
+验收脚本链接：[scripts/verify-service.sh](scripts/verify-service.sh)
 
 ### 方式 B：纯手动安装
 适合愿意全程手工配置的用户。直接看：
-- `docs/manual-setup.md`
+- [docs/manual-setup.md](docs/manual-setup.md)
 
 ## 你需要提前准备
 - 一个服务用户（建议：`svc_openclaw`）。
@@ -63,6 +65,7 @@ bash scripts/preflight.sh
 bash scripts/verify-service.sh
 bash scripts/check-feishu.sh   # 仅在启用飞书时
 ```
+脚本链接：[scripts/preflight.sh](scripts/preflight.sh) / [scripts/verify-service.sh](scripts/verify-service.sh) / [scripts/check-feishu.sh](scripts/check-feishu.sh)
 
 通过标准：
 - 服务 `running`
@@ -94,9 +97,9 @@ sudo launchctl print system/com.openclaw.service || echo \"service removed\"
 然后再去系统设置删除 `svc_openclaw` 用户。
 
 ## 文档导航
-- 配置参考（字段定义与错误对照）：`docs/config-reference.md`
-- 手动部署（全流程命令版）：`docs/manual-setup.md`
-- 快速开始（Agent 视角）：`docs/quickstart.md`
-- 日常运维：`docs/ops.md`
-- 故障排查：`docs/troubleshooting.md`
-- Self-Ops Skill（交给 OpenClaw 执行配置改动）：`prompts/openclaw-self-ops-skill.txt`
+- 配置参考（字段定义与错误对照）：[docs/config-reference.md](docs/config-reference.md)
+- 手动部署（全流程命令版）：[docs/manual-setup.md](docs/manual-setup.md)
+- 快速开始（Agent 视角）：[docs/quickstart.md](docs/quickstart.md)
+- 日常运维：[docs/ops.md](docs/ops.md)
+- 故障排查：[docs/troubleshooting.md](docs/troubleshooting.md)
+- Self-Ops Skill（交给 OpenClaw 执行配置改动）：[prompts/openclaw-self-ops-skill.txt](prompts/openclaw-self-ops-skill.txt)
