@@ -34,10 +34,10 @@ sudo launchctl kickstart -k system/com.openclaw.service
 ## Step 5) pairing -> allowlist -> 验收
 1. `dmPolicy=pairing` 时先触发并批准 pairing。  
 2. 验证通过后改 `dmPolicy=allowlist` + `allowFrom=[ou_xxx]`。  
-3. 验收：
+3. 验收（任意目录可执行）：
 ```bash
-bash scripts/verify-service.sh
-bash scripts/check-feishu.sh
+sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="
+lsof -nP -iTCP:3030 -sTCP:LISTEN
 ```
 
 通过标准：

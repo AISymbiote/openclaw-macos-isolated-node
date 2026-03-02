@@ -2,7 +2,8 @@
 
 ## 1) 重启后自检（30 秒）
 ```bash
-bash scripts/verify-service.sh
+sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="
+lsof -nP -iTCP:3030 -sTCP:LISTEN
 ```
 
 ## 2) 常用命令
@@ -43,7 +44,8 @@ sudo chmod 600 /Users/svc_openclaw/.openclaw/openclaw.json
 sudo launchctl kickstart -k system/com.openclaw.service
 
 # 6) 验收
-bash scripts/verify-service.sh
+sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="
+lsof -nP -iTCP:3030 -sTCP:LISTEN
 ```
 
 ## 4) 飞书专项检查

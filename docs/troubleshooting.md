@@ -45,5 +45,6 @@ bash scripts/safe-openclaw-cli.sh channels status --probe
 ## 7) 快速诊断顺序
 1. `bash scripts/preflight.sh`
 2. `sudo launchctl kickstart -k system/com.openclaw.service`
-3. `bash scripts/verify-service.sh`
-4. `bash scripts/check-feishu.sh`
+3. `sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="`
+4. `lsof -nP -iTCP:3030 -sTCP:LISTEN`
+5. `bash scripts/check-feishu.sh`

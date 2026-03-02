@@ -337,7 +337,7 @@ sudo launchctl kickstart -k system/com.openclaw.service
 每次你改 `openclaw.json`，都执行：
 ```bash
 # 1) 备份
-cp /Users/svc_openclaw/.openclaw/openclaw.json /Users/svc_openclaw/.openclaw/openclaw.json.bak.$(date +%Y%m%d%H%M%S)
+sudo cp /Users/svc_openclaw/.openclaw/openclaw.json /Users/svc_openclaw/.openclaw/openclaw.json.bak.$(date +%Y%m%d%H%M%S)
 
 # 2) 修改
 sudo vim /Users/svc_openclaw/.openclaw/openclaw.json
@@ -352,8 +352,9 @@ sudo chmod 600 /Users/svc_openclaw/.openclaw/openclaw.json
 # 5) 重启
 sudo launchctl kickstart -k system/com.openclaw.service
 
-# 6) 验收
-bash scripts/verify-service.sh
+# 6) 快速验收（不依赖仓库目录）
+sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="
+lsof -nP -iTCP:3030 -sTCP:LISTEN
 ```
 
 ---
@@ -390,7 +391,8 @@ sudo cp /Users/svc_openclaw/.openclaw/openclaw.json.bak.<timestamp> /Users/svc_o
 sudo chown svc_openclaw:staff /Users/svc_openclaw/.openclaw/openclaw.json
 sudo chmod 600 /Users/svc_openclaw/.openclaw/openclaw.json
 sudo launchctl kickstart -k system/com.openclaw.service
-bash scripts/verify-service.sh
+sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="
+lsof -nP -iTCP:3030 -sTCP:LISTEN
 ```
 
 ---
@@ -410,4 +412,4 @@ bash scripts/verify-service.sh
   1. JSON 校验
   2. `chown/chmod`
   3. `sudo launchctl kickstart -k system/com.openclaw.service`
-  4. `bash scripts/verify-service.sh`
+  4. `sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="` + `lsof -nP -iTCP:3030 -sTCP:LISTEN`

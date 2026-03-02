@@ -27,11 +27,12 @@ cat prompts/claude-install.txt
 ```
 提示词文件链接：[prompts/codex-install.txt](prompts/codex-install.txt) / [prompts/claude-install.txt](prompts/claude-install.txt)
 4. 按提示确认：`sudo`、API Key、Provider、聊天渠道。  
-5. 完成后执行验收：
+5. 完成后执行验收（任意目录可执行）：
 ```bash
-bash scripts/verify-service.sh
+sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="
+lsof -nP -iTCP:3030 -sTCP:LISTEN
 ```
-验收脚本链接：[scripts/verify-service.sh](scripts/verify-service.sh)
+（可选）仓库内完整验收脚本：[scripts/verify-service.sh](scripts/verify-service.sh)
 
 ### 方式 B：纯手动安装
 适合愿意全程手工配置的用户。直接看：
@@ -61,11 +62,10 @@ bash scripts/verify-service.sh
 
 ## 一分钟验收清单
 ```bash
-bash scripts/preflight.sh
-bash scripts/verify-service.sh
-bash scripts/check-feishu.sh   # 仅在启用飞书时
+sudo launchctl print system/com.openclaw.service | grep -E "state =|pid ="
+lsof -nP -iTCP:3030 -sTCP:LISTEN
 ```
-脚本链接：[scripts/preflight.sh](scripts/preflight.sh) / [scripts/verify-service.sh](scripts/verify-service.sh) / [scripts/check-feishu.sh](scripts/check-feishu.sh)
+（可选）仓库内脚本链接：[scripts/preflight.sh](scripts/preflight.sh) / [scripts/verify-service.sh](scripts/verify-service.sh) / [scripts/check-feishu.sh](scripts/check-feishu.sh)
 
 通过标准：
 - 服务 `running`
