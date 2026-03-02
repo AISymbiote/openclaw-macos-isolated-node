@@ -4,6 +4,7 @@
 1) 完整阅读并理解当前项目文件后再动手，至少包括：
 - README.md
 - docs/quickstart.md
+- docs/config-reference.md
 - docs/ops.md
 - docs/troubleshooting.md
 - templates/* 和 scripts/*
@@ -16,13 +17,18 @@
 边界要求：
 1) 自动执行：检查环境、创建目录、渲染模板、安装并启动服务、验收。
 2) 必须确认：密钥、Provider、聊天渠道、sudo。
-3) 不写入Git：密钥、本机私有路径成品、运行日志。
+3) 不写入 Git：密钥、本机私有路径成品、运行日志。
 
 执行顺序：
 1) 安装前：执行 scripts/preflight.sh，解释 PASS/WARN/FAIL。
-2) 安装后：确认启动命令与可用Provider/渠道，写入本机配置。
+2) 安装后：确认启动命令与可用 Provider/渠道，写入本机配置。
 3) 服务化：配置并启动 launchd。
 4) 验收：状态、端口、属主、错误日志。
+
+强制停顿确认点：
+1) API 键名必须正确：`baseUrl`、`models[]`、`primary=provider/model`。
+2) 飞书先写 appId/appSecret 并重启 OpenClaw，再配置长连接事件和权限。
+3) 每次手改配置后固定流程：`json 校验 -> chown/chmod -> kickstart -> verify`。
 
 每一步输出必须包含：
 - 目的

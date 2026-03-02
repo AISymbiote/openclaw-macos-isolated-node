@@ -2,26 +2,29 @@
 
 > 仓库只提供模板与流程。密钥、系统级安装、用户路径与权限变更都在用户本机由 Agent 经确认后执行，不写入 Git。
 
-## 1) 安装前能做什么（无需 OpenClaw）
-- 创建服务用户（建议：`svc_openclaw`）。
-- 运行预检脚本（检查系统命令和目录准备度）。
-- 准备模板文件（env、启动脚本、launchd plist）。
-
-示例命令：
+## 0) 先做预检（安装前）
 ```bash
-# 用户执行
 bash scripts/preflight.sh
 ```
 
-## 2) 安装后才能做什么
-- 确认 OpenClaw 的实际启动命令。
-- 确认当前版本支持的 Provider / 渠道。
-- 写入真实密钥并启动服务。
+## 1) 安装前可以做什么
+- 创建服务用户（建议：`svc_openclaw`）。
+- 准备目录：`apps` / `etc` / `var/openclaw` / `logs/openclaw`。
+- 准备模板：env、启动脚本、launchd plist、openclaw.json。
 
-## 3) 有 VPN / 无 VPN 选择
-- **无 VPN**：先跑本地基础能力，优先国内可达 Provider/渠道。
-- **有 VPN**：可扩展到更多国际 Provider/渠道。
-- 不需要一开始就开 VPN；按目标功能再决定。
+## 2) 安装后必须确认什么
+- OpenClaw 实际可执行命令与路径。
+- Provider 配置字段是否正确（见 `docs/config-reference.md`）。
+- 聊天渠道（如飞书）是否按顺序完成。
+
+## 3) 飞书机器人接入（强顺序）
+1. 在飞书创建应用，拿 `appId/appSecret`。
+2. 先写入 OpenClaw 配置并重启服务。
+3. 再在飞书后台配置：长连接（WebSocket）+ `im.message.receive_v1` + 权限 + 发布版本。
+4. 再执行 pairing：`list` -> `approve`。
+5. 验收通过后把 `dmPolicy` 切为 `allowlist` 并配置 `allowFrom`。
+
+> 如果顺序错了，常见现象是“事件订阅保存不了”或“没有 pending pairing 请求”。
 
 ## 4) 手动 vs 自动对照
 | 项目 | 主用户手动 | Agent 自动 |
@@ -34,12 +37,12 @@ bash scripts/preflight.sh
 
 ## 5) 最小验收
 ```bash
-# Agent 代执行（或你手动执行）
 bash scripts/verify-service.sh
 ```
 
-最少要看到：
-- 服务状态可读取
+至少满足：
+- 服务状态可读取且 `running`
 - 目标端口在监听
 - 进程属主是服务用户
-- 错误日志没有持续刷屏
+- 关键日志没有阻断错误
+- Feishu 通道状态（如启用）为 `running/works`

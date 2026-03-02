@@ -1,0 +1,46 @@
+{
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "enabled": true,
+      "token": "__REPLACE_GATEWAY_TOKEN__"
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "openai": {
+        "baseUrl": "__REPLACE_BASE_URL__",
+        "api": "__REPLACE_API_KIND__",
+        "models": [
+          {
+            "id": "__REPLACE_MODEL_ID__",
+            "name": "__REPLACE_MODEL_NAME__"
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai/__REPLACE_MODEL_ID__"
+      }
+    }
+  },
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "domain": "feishu",
+      "connectionMode": "websocket",
+      "dmPolicy": "pairing",
+      "groupPolicy": "open",
+      "accounts": {
+        "default": {
+          "appId": "__REPLACE_FEISHU_APP_ID__",
+          "appSecret": "__REPLACE_FEISHU_APP_SECRET__"
+        }
+      }
+    }
+  }
+}

@@ -3,8 +3,11 @@ set -euo pipefail
 
 SERVICE_LABEL="${SERVICE_LABEL:-com.openclaw.service}"
 SERVICE_USER="${SERVICE_USER:-svc_openclaw}"
+SERVICE_HOME="${SERVICE_HOME:-/Users/${SERVICE_USER}}"
 SERVICE_PORT="${SERVICE_PORT:-3030}"
-STDERR_LOG="${STDERR_LOG:-/Users/${SERVICE_USER}/logs/openclaw/stderr.log}"
+STDERR_LOG="${STDERR_LOG:-${SERVICE_HOME}/logs/openclaw/stderr.log}"
+LOG_LINES="${LOG_LINES:-200}"
+SAFE_CLI="$(cd "$(dirname "$0")" && pwd)/safe-openclaw-cli.sh"
 
 pass() { printf '[PASS] %s\n' "$1"; }
 warn() { printf '[WARN] %s\n' "$1"; }
@@ -47,17 +50,42 @@ else
   ok=false
 fi
 
+if [[ -x "${SAFE_CLI}" ]]; then
+  echo "--- Channel probe (service user) ---"
+  if "${SAFE_CLI}" channels status --probe; then
+    pass "channels status --probe succeeded"
+  else
+    warn "channels status --probe failed"
+    ok=false
+  fi
+else
+  warn "safe-openclaw-cli.sh not found or not executable; skip channel probe"
+fi
+
 if [[ -f "${STDERR_LOG}" ]]; then
-  warn "Last 100 lines of stderr log (${STDERR_LOG}):"
-  tail -n 100 "${STDERR_LOG}" || true
+  echo "--- Last ${LOG_LINES} lines of stderr (${STDERR_LOG}) ---"
+  tail -n "${LOG_LINES}" "${STDERR_LOG}" || true
+
+  # blocking patterns
+  if tail -n "${LOG_LINES}" "${STDERR_LOG}" | grep -Eqi 'Config invalid|Unknown model|permission denied|EACCES|No API key|rate limit reached|gateway token missing|too many failed authentication attempts'; then
+    warn "Blocking-like errors detected in recent logs"
+    ok=false
+  else
+    pass "No blocking-like error keywords found in recent logs"
+  fi
+
+  # ignorable patterns
+  if tail -n "${LOG_LINES}" "${STDERR_LOG}" | grep -Eqi 'duplicate plugin id|pyenv: cannot rehash'; then
+    warn "Found non-blocking warnings (duplicate plugin id / pyenv rehash)"
+  fi
 else
   warn "stderr log not found: ${STDERR_LOG}"
 fi
 
 if [[ "$ok" == true ]]; then
-  echo "RESULT: 可用。建议：保留当前配置，并记录版本与配置快照。"
+  echo "RESULT: 可用。建议：保留当前配置并记录可用快照。"
   exit 0
 else
-  echo "RESULT: 不可用。建议：按顺序检查 launchctl 状态 -> stderr 首错 -> 端口冲突 -> 权限与变量。"
+  echo "RESULT: 不可用。建议：按顺序检查 launchctl -> channel probe -> stderr 首错 -> 配置字段与权限。"
   exit 1
 fi

@@ -12,5 +12,10 @@ data/
 # Local generated deployment artifacts
 generated/
 
+# Local backups and temporary JSON
+*.bak.*
+*.tmp.json
+*.local.json
+
 # macOS
 .DS_Store

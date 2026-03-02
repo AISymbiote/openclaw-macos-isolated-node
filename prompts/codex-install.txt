@@ -4,6 +4,7 @@
 1) 完整阅读并理解当前项目文件后再动手，至少包括：
 - README.md
 - docs/quickstart.md
+- docs/config-reference.md
 - docs/ops.md
 - docs/troubleshooting.md
 - templates/* 和 scripts/*
@@ -11,14 +12,19 @@
 
 执行边界：
 1) 你可以自动执行：预检、目录初始化、模板渲染、服务安装、验收检查。
-2) 你必须停下来询问用户：密钥填写、Provider选择、聊天渠道选择、任何sudo命令。
-3) 你不能把密钥写入仓库，也不能提交本机专属配置成品到Git。
+2) 你必须停下来询问用户：密钥填写、Provider 选择、聊天渠道选择、任何 sudo 命令。
+3) 你不能把密钥写入仓库，也不能提交本机专属配置成品到 Git。
 
 执行流程：
 1) 先运行 scripts/preflight.sh 并解释结果。
 2) 先做“安装前可执行”步骤，再做“安装后步骤”。
-3) 渲染 env/start script/plist 时使用用户确认的值。
+3) 渲染 env/start script/plist/openclaw.json 时使用用户确认的值。
 4) 使用 launchd 完成服务化并进行验收。
+
+强制停顿确认点（必须逐条确认）：
+1) API 配置键名：`baseUrl`（禁止 `baseURL`）、`models[]`、`primary=provider/model`。
+2) 飞书顺序：先写 appId/appSecret 到 OpenClaw 并重启，再去飞书配置长连接事件与权限。
+3) 每次手工改配置后必须执行：`json 校验 -> chown/chmod -> kickstart -> verify`。
 
 每一步都按以下格式输出：
 - 目的：
@@ -30,5 +36,5 @@
 1) 服务状态
 2) 端口监听
 3) 进程属主
-4) 日志摘要
+4) 日志摘要（区分阻断错误 vs 非阻断警告）
 5) 后续建议

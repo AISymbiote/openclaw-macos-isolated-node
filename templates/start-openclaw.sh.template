@@ -2,6 +2,9 @@
 set -euo pipefail
 
 # Render placeholders with real paths/command on the target machine.
+export HOME=/Users/{{SERVICE_USER}}
+export PATH=/Users/{{SERVICE_USER}}/.local/npm/bin:$PATH
+
 source {{ENV_PATH}}
-cd {{APP_DIR}}
+cd /Users/{{SERVICE_USER}}
 exec {{START_COMMAND}}

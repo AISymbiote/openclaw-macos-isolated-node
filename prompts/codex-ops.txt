@@ -3,6 +3,7 @@
 执行前先做：
 1) 完整阅读并理解当前项目文件后再执行，至少包括：
 - README.md
+- docs/config-reference.md
 - docs/quickstart.md
 - docs/ops.md
 - docs/troubleshooting.md
@@ -21,8 +22,10 @@
 
 操作规则：
 1) 先运行 scripts/verify-service.sh。
-2) 变更配置前先备份 env。
-3) 任何异常按固定顺序排查：launchctl -> stderr -> port -> permission -> vars。
+2) 变更配置前先备份。
+3) 任何异常按固定顺序排查：launchctl -> channel probe -> stderr -> port -> permission -> vars。
+4) 日志阅读只看“本次重启后的最新时段”，避免被历史错误干扰。
+5) `duplicate plugin id` 归类为非阻断警告（除非确认导致功能冲突）。
 
 每一步输出格式：
 - 目的：

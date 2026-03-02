@@ -1,80 +1,80 @@
 # OpenClaw macOS Isolated Node
 
-> 仓库只提供模板与流程。密钥、系统级安装、用户路径与权限变更都在用户本机由 Agent 经确认后执行，不写入 Git。
+> 给新用户的目标：在一台 macOS 上，让主用户正常工作，同时让服务用户隔离运行 OpenClaw（launchd 托管）。
 
-## 架构概览（30 秒）
-- 主工作账户（用户 A）用于日常 GUI 工作负载。
-- 独立服务账户（用户 B，默认 `svc_openclaw`）用于运行 OpenClaw 后台进程。
-- 在单台 macOS 主机上实现多用户隔离部署与并行运行。
+## 你会得到什么
+- 主用户（A）继续日常使用 macOS。
+- 服务用户（B，默认 `svc_openclaw`）独立运行 OpenClaw。
+- API 侧按 OpenAI-compatible 配置。
+- 聊天渠道以飞书机器人为主示例。
 
-## 这个项目是做什么的
-本项目提供一套 macOS 本地部署方案，使同一主机上的两个账户职责分离：
-- 用户 A：交互式桌面会话（GUI）与日常业务操作。
-- 用户 B：服务运行账户，托管 OpenClaw 长驻进程（由 `launchd` 管理）。
+## 先选一种安装方式
 
-## 这样做的 4 个优势
-- **权限与数据隔离**：服务账户与工作账户分离，运行数据、日志和配置文件位于独立用户目录，降低相互影响。
-- **并行执行**：交互式工作负载与后台服务负载并发运行，避免会话切换导致服务中断。
-- **本地可控部署**：服务与数据驻留本机，便于本地网络策略、访问控制与审计。
-- **低基础设施成本**：无需新增物理主机或云实例，单机即可完成部署与运维。
+### 方式 A（推荐）：Agent 引导安装
+适合第一次部署，按提示确认即可。
 
-## 你只需要手动做什么
-- 创建服务用户（默认示例：`svc_openclaw`，可改名）。
-- 准备密钥（API Key、渠道 Token）。
-- 选择 Provider 和聊天渠道（安装时由 Agent 提问确认）。
-- 在系统级命令前确认 `sudo` 授权。
-
-## Agent 会替你做什么
-- 初始化目录与文件模板。
-- 渲染本机配置（env、启动脚本、plist）。
-- 安装并管理 launchd 服务。
-- 执行验收检查（状态、端口、日志）。
-
-## 快速开始
-1. 拉取并进入仓库（**用户执行**）
+1. 进入仓库
 ```bash
 git clone <YOUR_REPO_URL>
 cd openclaw-macos-isolated-node
 ```
-2. 在该目录打开 Codex 或 Claude Code（**用户执行**）。
-3. 把安装 Prompt 全文贴给 Agent（**用户执行**）
+2. 打开 Codex 或 Claude Code。  
+3. 复制并发送安装提示词（二选一）
 ```bash
-# 二选一
 cat prompts/codex-install.txt
+# 或
 cat prompts/claude-install.txt
 ```
-4. 按 Agent 提问确认关键项（**用户执行**）
-- `sudo` 授权
-- 密钥填写
-- Provider 选择
-- 聊天渠道选择
-5. 让 Agent 完成预检、安装和验收（**Agent 代执行**）。
-
-## 详细步骤
-1. 预检（**Agent 代执行**）
-```bash
-bash scripts/preflight.sh
-```
-2. 安装前准备（**Agent 代执行 + 用户确认**）
-- Agent 初始化目录与模板。
-- 用户确认服务用户、网络路径（有/无 VPN）。
-3. 安装与配置（**Agent 代执行 + 用户确认**）
-- Agent 根据你选择的 Provider/渠道渲染本机配置。
-- 用户提供密钥并确认写入。
-4. 服务化启动（**Agent 代执行 + 用户确认 sudo**）
-- Agent 配置并启动 launchd 服务。
-5. 验收（**Agent 代执行**）
+4. 按提示确认：`sudo`、API Key、Provider、聊天渠道。  
+5. 完成后执行验收：
 ```bash
 bash scripts/verify-service.sh
 ```
-6. 日常运维（**用户执行或 Agent 代执行**）
-- 安装后使用 `prompts/codex-ops.txt` 或 `prompts/claude-ops.txt` 做重启、改配置、升级、回滚。
 
-## 命令标签说明
-- `用户执行`：你在终端手动执行。
-- `Agent 代执行`：由 Codex/Claude Code 执行，关键步骤会先向你确认。
+### 方式 B：纯手动安装
+适合愿意全程手工配置的用户。直接看：
+- `docs/manual-setup.md`
+
+## 你需要提前准备
+- 一个服务用户（建议：`svc_openclaw`）。
+- API Key（OpenAI-compatible 提供方）。
+- 飞书应用的 `App ID` 和 `App Secret`（如果要启用飞书）。
+
+## 新用户最容易踩坑的 4 件事
+1. `baseURL` 写错：必须是 `baseUrl`。  
+2. `primary` 没写 provider：必须是 `openai/<model>`。  
+3. 飞书顺序错误：先把 `appId/appSecret` 写进 OpenClaw 并重启，再去飞书配置长连接事件。  
+4. 配置改完没修权限或没重启：要做 `json校验 -> chown/chmod -> kickstart -> verify`。
+
+## 飞书接入顺序（务必按这个来）
+1. 飞书创建应用，拿 `appId/appSecret`。  
+2. 先写入 OpenClaw 配置并重启服务。  
+3. 再在飞书后台配置：长连接（WebSocket）+ `im.message.receive_v1` + 权限 + 发布版本。  
+4. 私聊机器人触发 pairing，服务侧 approve。  
+5. 稳定后把 `dmPolicy` 从 `pairing` 切到 `allowlist`。
+
+## 一分钟验收清单
+```bash
+bash scripts/preflight.sh
+bash scripts/verify-service.sh
+bash scripts/check-feishu.sh   # 仅在启用飞书时
+```
+
+通过标准：
+- 服务 `running`
+- 3030 端口监听
+- 进程属主是 `svc_openclaw`
+- 日志无阻断错误
+- Feishu 通道（启用时）显示 `running/works`
+
+## 安全边界
+- 密钥不要提交到 Git。
+- 本仓库只放模板和流程，不放你的生产密钥与本机专属成品配置。
+- 若密钥泄露，立即轮换并重启服务。
 
 ## 文档导航
-- 快速开始：`docs/quickstart.md`
+- 配置参考（字段定义与错误对照）：`docs/config-reference.md`
+- 手动部署（全流程命令版）：`docs/manual-setup.md`
+- 快速开始（Agent 视角）：`docs/quickstart.md`
 - 日常运维：`docs/ops.md`
 - 故障排查：`docs/troubleshooting.md`
