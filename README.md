@@ -76,6 +76,23 @@ bash scripts/check-feishu.sh   # 仅在启用飞书时
 - 本仓库只放模板和流程，不放你的生产密钥与本机专属成品配置。
 - 若密钥泄露，立即轮换并重启服务。
 
+## 服务清零（删除 `svc_openclaw` 前）
+如果你准备删除服务用户，先把服务清理干净，避免系统残留无效自启动：
+
+```bash
+# 1) 停止并卸载服务
+sudo launchctl bootout system /Library/LaunchDaemons/com.openclaw.service.plist
+sudo rm -f /Library/LaunchDaemons/com.openclaw.service.plist
+
+# 2) 可选：备份配置
+sudo cp -R /Users/svc_openclaw/.openclaw /Users/rocky/Desktop/openclaw-backup-$(date +%Y%m%d%H%M%S)
+
+# 3) 验证已清理
+sudo launchctl print system/com.openclaw.service || echo \"service removed\"
+```
+
+然后再去系统设置删除 `svc_openclaw` 用户。
+
 ## 文档导航
 - 配置参考（字段定义与错误对照）：`docs/config-reference.md`
 - 手动部署（全流程命令版）：`docs/manual-setup.md`
